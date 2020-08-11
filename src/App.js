@@ -1,24 +1,17 @@
 import React from 'react';
-import logo from './logo.svg';
+//import logo from './logo.svg';
+import Sprite from './Sprite.js';
+import Point from './Geometry.js';
 import './App.css';
 
 function App() {
+  const faceAnnimation = new Sprite("amaura-face-walk", './Amaura.png', (new Point(57, 71)), (new Point(297, 71)), new Point(20, 26), 12, "2s", {})
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>TEXT</div>
+      <div className="Sprite-holder">
+      </div>
+      <div style={faceAnnimation.toCss()}></div>
     </div>
   );
 }
