@@ -1,11 +1,11 @@
 import React from 'react';
 //import logo from './logo.svg';
 import Sprite from './Sprite.js';
-import Point from './Geometry.js';
+import Vector from './Geometry.js';
 import './App.css';
 
 function App() {
-  const faceAnnimation = new Sprite("amaura-face-walk", './Amaura.png', (new Point(57, 71)), (new Point(297, 71)), new Point(20, 26), 12, "2s", {})
+  const faceAnnimation = new Sprite("amaura-face-walk", './Amaura.png', new Vector(57, 71), new Vector(1, 0), new Vector(20, 26), 12, "2s", {})
   return (
     <div>
       <div>TEXT</div>

@@ -1,3 +1,5 @@
+import Vector from './Geometry.js';
+
 function camelToCss(string) {
   return string.replace(/[\w]([A-Z])/g, function(m) {
     return m[0] + "-" + m[1];
@@ -30,11 +32,11 @@ function uploadKeyFrame(keyFrameID, keyFrameContent) {
 }
 
 class Sprite {
-  constructor(id, imageSrc, firstSprite, lastSprite, spriteSize, framesCount, animationTime, additionalStyle) {
+  constructor(id, imageSrc, firstSprite, spriteDirection, spriteSize, framesCount, animationTime, additionalStyle) {
     this.id = id;
     this.imageSrc = imageSrc;
     this.firstSprite = firstSprite;
-    this.lastSprite = lastSprite;
+    this.spriteDirection = spriteDirection;
     this.spriteSize = spriteSize;
     this.additionalStyle = additionalStyle;
     this.framesCount = framesCount;
@@ -43,13 +45,17 @@ class Sprite {
     uploadKeyFrame(this.id, this.keyFrames)
   }
 
+  lastSprite() {
+    return Vector.add(this.firstSprite, Vector.matrix_mult(Vector.mult(this.framesCount, this.spriteSize), this.spriteDirection))
+  }
+
   generateKeyFrames() {
     return {
       "0%": {
         backgroundPosition: `-${this.firstSprite.x}px -${this.firstSprite.y}px`
       },
       "100%": {
-        backgroundPosition: `-${this.lastSprite.x}px -${this.lastSprite.y}px`
+        backgroundPosition: `-${this.lastSprite().x}px -${this.lastSprite().y}px`
       }
     };
   }

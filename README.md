@@ -1,3 +1,10 @@
+# Sprite
+
+This project contains the javascript class `Sprite` that create style requirement and provide css to create simple animation from sprite.
+
+
+# About React
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
