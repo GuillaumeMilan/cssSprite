@@ -20,6 +20,12 @@
   margin-top: 10px;
 }
 
+.Minigame {
+  background-color: #e1e1e1;
+  height: 640px;
+  width: 480px;
+}
+
 @keyframes sprite-animate{
  0% {
    background-position: -57px -71px;
