@@ -20,11 +20,12 @@ function uploadKeyFrame(keyFrameID, keyFrameContent) {
     for(var j = 0; j < (document.styleSheets[i].cssRules.length); j++) {
       if((document.styleSheets[i].cssRules[j] instanceof CSSKeyframesRule) && document.styleSheets[i].cssRules[j].name === keyFrameID) {
         keyFrameSheet = i;keyFrameIndex = j;
+        document.styleSheets[keyFrameSheet].deleteRule(keyFrameIndex)
         break;
       }
     }
   }
-  if(!(keyFrameSheet && keyFrameIndex)) {
+  if((keyFrameSheet === undefined) || (keyFrameIndex === undefined)) {
     keyFrameSheet = 0;
     keyFrameIndex = document.styleSheets[keyFrameSheet].length;
   }

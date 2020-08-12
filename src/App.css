@@ -16,6 +16,8 @@
    background-position: -57px -71px;
  }
  100% {
-   background-position: -297px -71px;
+   /* The commented line is the correct CSS rule, this is commented in order to test CSSRule replacement */
+   /*background-position: -297px -71px;*/
+   background-position: -200px -71px;
  }
 }
