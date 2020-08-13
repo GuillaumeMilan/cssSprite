@@ -109,7 +109,9 @@ class App extends React.Component {
 
   render() {
     return (
+
       <div className="Sprites-container">
+        <div className="Sprite-example-container"><div className="Sprite-example"></div></div>
         <div className="Minigame" onClick={this.onMoveSprite.bind(this)} ref={this.setMinigameRef.bind(this)}>
           <div ref={this.setSpriteRef.bind(this)} style={{
             ...this.aumauraSpriteStyle(),

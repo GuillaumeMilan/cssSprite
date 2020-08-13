@@ -33,7 +33,7 @@ function uploadKeyFrame(keyFrameID, keyFrameContent) {
 }
 
 class Sprite {
-  constructor(id, imageSrc, firstSprite, spriteDirection, spriteSize, framesCount, animationTime, additionalStyle) {
+  constructor(id, imageSrc, firstSprite, spriteDirection, spriteSize, framesCount, animationTime, opts) {
     this.id = id;
     this.imageSrc = imageSrc;
     this.firstSprite = firstSprite;
