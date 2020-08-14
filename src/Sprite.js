@@ -33,21 +33,32 @@ function uploadKeyFrame(keyFrameID, keyFrameContent) {
 }
 
 class Sprite {
+
+  #spriteSize = undefined;
+
   constructor(id, imageSrc, firstSprite, spriteDirection, spriteSize, framesCount, animationTime, opts) {
     this.id = id;
     this.imageSrc = imageSrc;
     this.firstSprite = firstSprite;
     this.spriteDirection = spriteDirection;
-    this.spriteSize = spriteSize;
-    this.additionalStyle = additionalStyle;
+    this.#spriteSize = spriteSize;
     this.framesCount = framesCount;
     this.animationTime = animationTime;
     this.keyFrames = this.generateKeyFrames();
+    this.opts = opts;
     uploadKeyFrame(this.id, this.keyFrames)
   }
 
+  get scale() {
+    return Math.pow(2, (this.opts && this.opts.scalePow) || 0)
+  }
+
+  get spriteSize() {
+    return Vector.mult(this.scale, this.#spriteSize)
+  }
+
   lastSprite() {
-    return Vector.add(this.firstSprite, Vector.matrix_mult(Vector.mult(this.framesCount, this.spriteSize), this.spriteDirection))
+    return Vector.add(this.firstSprite, Vector.matrix_mult(Vector.mult(this.framesCount, this.#spriteSize), this.spriteDirection))
   }
 
   generateKeyFrames() {
@@ -61,13 +72,21 @@ class Sprite {
     };
   }
 
-  toCss(additionalStyle) {
+  toContainerCss() {
     return {
-      width: this.spriteSize.x,
-      height: this.spriteSize.y,
+      width: "0px"
+    }
+  }
+
+  toCss() {
+    return {
+      width: this.#spriteSize.x,
+      height: this.#spriteSize.y,
       background: `url('${this.imageSrc}')`,
       backgroundPosition: `-${this.firstSprite.x}px -${this.firstSprite.y}px`,
-      animation: `${this.id} ${this.animationTime} steps(${this.framesCount}) infinite`
+      animation: `${this.id} ${this.animationTime/1000}s steps(${this.framesCount}) infinite`,
+      transformOrigin: "0px 0px",
+      transform: `scale(${this.scale})`,
     }
   }
 }
