@@ -13,11 +13,20 @@ class FSM {
 
   }
 
+  clearTimeouts(opts) {
+    if(!opts) return;
+    if(opts.type === "all")
+      return this.clearAllTimeouts();
+    if(opts.type === "group")
+      return this.clearTypedTimeouts(opts.group)
+  }
+
   clearAllTimeouts() {
-    Object.keys(this.timeouts).forEach(function(timeout_type) {
-      this.timeouts[timeout_type].forEach((timeout) => clearTimeout(timeout));
+    const self = this;
+    Object.keys(self.timeouts).forEach(function(timeout_type) {
+      self.timeouts[timeout_type].forEach((timeout) => clearTimeout(timeout));
     });
-    this.timeouts = {};
+    self.timeouts = {};
     return;
   }
 
@@ -60,6 +69,7 @@ class FSM {
       "next_state": self.applyNextState.bind(self),
       "keep_state": self.keepState.bind(self),
     })[action_result.type](action_name, previous_state, action_result)
+    this.clearTimeouts(action_result.clearTimeouts)
     this.addTimeouts(action_result.timeouts)
     return
   }

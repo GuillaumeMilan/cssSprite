@@ -115,7 +115,12 @@ class App extends React.Component {
   }
 
   aumauraSpriteStyle() {
-    return this.selectedSprite().toCss()
+    try {
+      return this.selectedSprite().toCss()
+    } catch(e) {
+      console.log("this.state", this.state)
+      throw(e)
+    }
   }
 
   onChangeDirection(direction) {
@@ -154,23 +159,23 @@ class App extends React.Component {
   }
 
   onIdleing(e) {
-    return {type: "next_state"}
+    return {type: "next_state", clearTimeouts: {type: "all"}}
   }
 
   onEat(e) {
-    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: this.EatSprite.animationTime}]}
+    return {type: "next_state", data: {direction: "down"}, timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: this.EatSprite.animationTime}], clearTimeouts: {type: "all"}}
   }
 
   onFallingASleep(e) {
-    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onSleeping"), delay: this.FallASleepSprite.animationTime}]}
+    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onSleeping"), delay: this.FallASleepSprite.animationTime}], clearTimeouts: {type: "all"}}
   }
 
   onSleeping(e) {
-    return {type: "next_state"}
+    return {type: "next_state", clearTimeouts: {type: "all"}}
   }
 
   onWakingUp(e) {
-    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onWakingUp"), delay: this.WakingUpSprite.animationTime}]}
+    return {type: "next_state", data: {direction: "down"}, timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: this.WakingUpSprite.animationTime}], clearTimeouts: {type: "all"}}
   }
 
   onMove(e) {
@@ -186,13 +191,13 @@ class App extends React.Component {
 
     const angle = Math.floor(angleSides*movementVect.getAngle()/Math.PI)
 
+    /* In case angle can't be defined we make down angle*/
     const direction = ({
       0: "right",
       1: "up",
       2: "left",
       3: "down"
-    })[Math.ceil(angle/2) % angleSides]
-
+    })[Math.ceil(angle/2) % angleSides] || "down"
     const transition = Math.sqrt(Math.pow(movementVect.x, 2) + Math.pow(movementVect.y, 2))/this.movementSpeed
 
     if(this.state.actionTimeout)
@@ -203,7 +208,7 @@ class App extends React.Component {
       transition: transition,
       direction: direction
     }
-    return {type: "next_state", data: data, timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: transition*1000}]}
+    return {type: "next_state", data: data, timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: transition*1000}], clearTimeouts: {type: "all"}}
   }
 
   render() {
