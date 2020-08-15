@@ -207,7 +207,7 @@ class App extends React.Component {
   }
 
   render() {
-    console.log("State", this.state)
+    //console.log("State", this.state)
     return (
       <div className="Sprites-container">
         <div className="Sprite-example-container"><div className="Sprite-example"></div></div>
