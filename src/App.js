@@ -1,25 +1,55 @@
 import React from 'react';
 import Sprite from './Sprite.js';
 import Vector from './Geometry.js';
+import FSMTransitions from './FSM/FSMTransitions.js'
+import FSM from './FSM/FSM.js'
 import './App.css';
 
 
 /* TODO Implement FSM*/
 /*
  * idle           -----onMove         -----> moving
+ * moving         -----onMove         -----> moving
  * idle           -----onEat          -----> eating
  * idle           -----onFallingASleep-----> falling-asleep
  * falling-asleep -----onSleeping     -----> sleeping
  * sleeping       -----onWakingUp     -----> waking-up
  * waking-up      -----onIdleing      -----> idle
  * moving         -----onIdleing      -----> idle
- * moving         -----onMove         -----> moving
+ * eating         -----onIdleing      -----> idle
  */
 
 class App extends React.Component {
 
   constructor(props) {
+
     super(props);
+
+    const self = this;
+
+    this.FSMTransitions = new FSMTransitions()
+    this.FSMTransitions.addAction("onMove",          this.onMove.bind(this))
+    this.FSMTransitions.addAction("onEat",           this.onEat.bind(this))
+    this.FSMTransitions.addAction("onFallingASleep", this.onFallingASleep.bind(this))
+    this.FSMTransitions.addAction("onSleeping",      this.onSleeping.bind(this))
+    this.FSMTransitions.addAction("onWakingUp",      this.onWakingUp.bind(this))
+    this.FSMTransitions.addAction("onIdleing",       this.onIdleing.bind(this))
+
+    this.FSMTransitions.addTransition("onMove",           "idle",           ["moving"])
+    this.FSMTransitions.addTransition("onMove",           "moving",         ["moving"])
+    this.FSMTransitions.addTransition("onEat",            "idle",           ["eating"])
+    this.FSMTransitions.addTransition("onFallingASleep",  "idle",           ["falling-asleep"])
+    this.FSMTransitions.addTransition("onSleeping",       "falling-asleep", ["sleeping"])
+    this.FSMTransitions.addTransition("onWakingUp",       "sleeping",       ["waking-up"])
+    this.FSMTransitions.addTransition("onIdleing",        "waking-up",      ["idle"])
+    this.FSMTransitions.addTransition("onIdleing",        "moving",         ["idle"])
+    this.FSMTransitions.addTransition("onIdleing",        "eating",         ["idle"])
+
+    this.FSM = new FSM("idle", this.FSMTransitions, function(state, data) {
+      self.setState({...data, action: state})
+    })
+
+    console.log("this.FSMTransitions", this.FSMTransitions)
 
     this.spriteSize = new Vector(20, 28);
     this.movementSpeed = 120;
@@ -40,10 +70,22 @@ class App extends React.Component {
 
 
     this.state = {
+      action: "idle",
       direction: "down",
       position: new Vector(40, 40),
       transition: 0,
     }
+  }
+
+  onFSMEvent(e, action) {
+    return function () {
+      try {
+        return this.FSM.onEvent(e, action, this.state.action)
+      } catch(e) {
+        console.error(e)
+        return
+      }
+    }.bind(this)
   }
 
   selectedSprite() {
@@ -86,9 +128,9 @@ class App extends React.Component {
     const self = this;
     window.addEventListener("keydown", function(e) {
       const f = {
-        69: () => self.onEat(),
-        82: () => self.onFallingASleep(),
-        90: () => self.onWakingUp(),
+        69: () => self.onFSMEvent(e, "onEat")(),
+        82: () => self.onFSMEvent(e, "onFallingASleep")(),
+        90: () => self.onFSMEvent(e, "onWakingUp")(),
         87: () => self.onChangeDirection("up"),
         65: () => self.onChangeDirection("left"),
         83: () => self.onChangeDirection("down"),
@@ -111,61 +153,27 @@ class App extends React.Component {
     this.setState({spriteRef: ref})
   }
 
+  onIdleing(e) {
+    return {type: "next_state"}
+  }
+
   onEat(e) {
-    if(this.state.action)
-      return
-
-    if(this.state.actionTimeout)
-      clearTimeout(this.state.actionTimeout)
-
-    this.setState({
-      action: "eating",
-      actionTimeout: setTimeout(() => this.setState({action: false}), this.EatSprite.animationTime)
-    })
+    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: this.EatSprite.animationTime}]}
   }
 
   onFallingASleep(e) {
-    if(this.state.action)
-      return
-
-    if(this.state.actionTimeout)
-      clearTimeout(this.state.actionTimeout)
-
-    this.setState({
-      action: "falling-asleep",
-      actionTimeout: setTimeout(() => this.onSleeping(), this.FallASleepSprite.animationTime)
-    })
+    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onSleeping"), delay: this.FallASleepSprite.animationTime}]}
   }
 
   onSleeping(e) {
-    if(this.state.action !== "falling-asleep")
-      return
-
-    if(this.state.actionTimeout)
-      clearTimeout(this.state.actionTimeout)
-
-    this.setState({
-      action: "sleeping",
-    })
+    return {type: "next_state"}
   }
 
   onWakingUp(e) {
-    if(this.state.action !== "sleeping")
-      return
-
-    if(this.state.actionTimeout)
-      clearTimeout(this.state.actionTimeout)
-
-    this.setState({
-      action: "waking-up",
-      actionTimeout: setTimeout(() => this.setState({action: false}), this.WakingUpSprite.animationTime)
-    })
+    return {type: "next_state", timeouts: [{type: "common", callback: this.onFSMEvent(null, "onWakingUp"), delay: this.WakingUpSprite.animationTime}]}
   }
 
   onMove(e) {
-    if(this.state.action && this.state.action !== "moving")
-      return
-
     const rect = this.state.minigameRef.getBoundingClientRect();
     const spriteRect = this.state.spriteRef.getBoundingClientRect();
 
@@ -190,17 +198,12 @@ class App extends React.Component {
     if(this.state.actionTimeout)
       clearTimeout(this.state.actionTimeout)
 
-    this.setState({
-      action: "moving",
-      actionTimeout: setTimeout(() => this.setState({action: false}), transition * 1000),
+    const data = {
       position: new Vector(x, y),
       transition: transition,
       direction: direction
-    })
-  }
-
-  onIdleing(e) {
-    this.setState({action: "idle"})
+    }
+    return {type: "next_state", data: data, timeouts: [{type: "common", callback: this.onFSMEvent(null, "onIdleing"), delay: transition*1000}]}
   }
 
   render() {
@@ -208,7 +211,7 @@ class App extends React.Component {
     return (
       <div className="Sprites-container">
         <div className="Sprite-example-container"><div className="Sprite-example"></div></div>
-        <div className="Minigame" onClick={this.onMove.bind(this)} ref={this.setMinigameRef.bind(this)}>
+        <div className="Minigame" onClick={(e) => this.onFSMEvent(e, "onMove")()} ref={this.setMinigameRef.bind(this)}>
           <div className="PixelArt" ref={this.setSpriteRef.bind(this)} style={{
             ...this.aumauraSpriteStyle(),
               position: "relative",
