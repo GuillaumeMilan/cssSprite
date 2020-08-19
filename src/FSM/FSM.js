@@ -74,6 +74,11 @@ class FSM {
     return
   }
 
+  canExecuteAction(action_name, current_state) {
+    const next_states = this.transitions[action_name].allowed_transitions[current_state]
+    return !!next_states
+  }
+
   onEvent(e, action_name, current_state) {
     const next_states = this.transitions[action_name].allowed_transitions[current_state]
     if(!next_states) {
