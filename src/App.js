@@ -1,8 +1,9 @@
 import React from 'react';
 import Sprite from './Sprite.js';
 import Vector from './Geometry.js';
-import FSMTransitions from './FSM/FSMTransitions.js'
-import FSM from './FSM/FSM.js'
+import FSMTransitions from './FSM/FSMTransitions.js';
+import FSM from './FSM/FSM.js';
+import Pokemon from './Pokemon/Pokemon.js';
 import './App.css';
 
 
@@ -27,6 +28,9 @@ class App extends React.Component {
 
     const self = this;
 
+    //this.Amaura2 = <Pokemon name="amaura2" src="./Amaura.png" position={new Vector(80, 80)} spriteRef={function(ref) {console.log("POKEMON REF", ref)}}/>
+    this.Amaura3 = <Pokemon name="amaura3" src="./Amaura.png" position={new Vector(200, 200)} minigameRef={() => self.state.minigameRef} spriteRef={function(ref, onFSMEvent) {self.Amaura3onFSMEvent = onFSMEvent}}/>
+    /*
     this.FSMTransitions = new FSMTransitions()
     this.FSMTransitions.addAction("onMove",          this.onMove.bind(this))
     this.FSMTransitions.addAction("onEat",           this.onEat.bind(this))
@@ -44,6 +48,7 @@ class App extends React.Component {
     this.FSMTransitions.addTransition("onIdleing",        "waking-up",      ["idle"])
     this.FSMTransitions.addTransition("onIdleing",        "moving",         ["idle"])
     this.FSMTransitions.addTransition("onIdleing",        "eating",         ["idle"])
+    */
 
     this.FSM = new FSM("idle", this.FSMTransitions, function(state, data) {
       self.setState({...data, action: state})
@@ -133,13 +138,13 @@ class App extends React.Component {
     const self = this;
     window.addEventListener("keydown", function(e) {
       const f = {
-        69: () => self.onFSMEvent(e, "onEat")(),
-        82: () => self.onFSMEvent(e, "onFallingASleep")(),
-        90: () => self.onFSMEvent(e, "onWakingUp")(),
-        87: () => self.onChangeDirection("up"),
-        65: () => self.onChangeDirection("left"),
-        83: () => self.onChangeDirection("down"),
-        68: () => self.onChangeDirection("right")
+        69: () => self.Amaura3onFSMEvent(e, "onEat")(), /* E */
+        82: () => self.Amaura3onFSMEvent(e, "onFallingASleep")(), /* R */
+        90: () => self.Amaura3onFSMEvent(e, "onWakingUp")(), /* Z */
+        87: () => self.onChangeDirection("up"), /* W */
+        65: () => self.onChangeDirection("left"), /* A */
+        83: () => self.onChangeDirection("down"), /* S */
+        68: () => self.onChangeDirection("right") /* D */
       }[e.keyCode]
       console.log("KEYCODE", e.keyCode)
       return f && f()
@@ -216,13 +221,17 @@ class App extends React.Component {
     return (
       <div className="Sprites-container">
         <div className="Sprite-example-container"><div className="Sprite-example"></div></div>
-        <div className="Minigame" onClick={(e) => this.onFSMEvent(e, "onMove")()} ref={this.setMinigameRef.bind(this)}>
-          <div className="PixelArt" ref={this.setSpriteRef.bind(this)} style={{
-            ...this.aumauraSpriteStyle(),
-              position: "relative",
-              top: this.state.position.y - this.selectedSprite().spriteSize.y/2,
-              left: this.state.position.x - this.selectedSprite().spriteSize.x/2,
-              transition: `top ${this.state.transition}s linear, left ${this.state.transition}s linear`
+        <div className="Minigame" onClick={(e) => this.Amaura3onFSMEvent(e, "onMove")()} ref={this.setMinigameRef.bind(this)}>
+          {this.Amaura3}
+          <div style={{
+            position: "relative",
+            float: "left",
+            height: "100px",
+            width: "100px",
+            backgroundColor: "#f00",
+            zIndex: 110,
+            top: "10px",
+            left: "10px"
           }}></div>
         </div>
       </div>
