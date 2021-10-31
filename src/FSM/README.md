@@ -1,6 +1,7 @@
 # FSM manager
 
-This package implement a Finite State Machine handler.
+This package implement a Finite State and Transitions Machine handler.
+It doesn't handle the transactionality.
 
 In this package we use the following types:
 
@@ -38,7 +39,7 @@ You can initialize a new FSM object by declaring a new `FSM` object:
 
 
 ```javascript
-new FSM(initial_state, myFSMTransitions, store_function)
+const myFSM = new FSM(initial_state, myFSMTransitions, store_function)
 ```
 
 Where:
@@ -53,4 +54,10 @@ store_function(new_state, metadata) :: any()
 
 ## Events
 
-Once your FSMTransition
+Now you can apply events on your FSM object
+
+```javascript
+myFSM.onEvent(params, action, current_state)
+```
+
+Then the state will be updated

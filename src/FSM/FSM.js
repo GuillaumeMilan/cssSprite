@@ -54,12 +54,12 @@ class FSM {
     if(this.transitions[action_name].allowed_transitions[previous_state].indexOf(action_result.new_state) !== -1)
       return this.setState(action_result.new_state, action_result.data)
     else
-      throw("[FSM] Unexpected next_state result: "+action_result.new_state+".\nExpected one of " + this.transitions[previous_state].allowed_transitions.toString())
+      throw(new Error("[FSM] Unexpected next_state result: "+action_result.new_state+".\nExpected one of " + this.transitions[previous_state].allowed_transitions.toString()))
   }
 
   keepState(action_name, previous_state, action_result) {
     if(this.transitions[previous_state].allowed_transitions.indexOf(previous_state) === -1)
-      throw("[FSM] Unexpected keep_state result: "+previous_state+".\nExpected a transition to one of " + this.transitions[previous_state].allowed_transitions.toString())
+      throw(new Error("[FSM] Unexpected keep_state result: "+previous_state+".\nExpected a transition to one of " + this.transitions[previous_state].allowed_transitions.toString()))
     return this.setState(action_result.previous_state, action_result.data)
   }
 
@@ -82,7 +82,7 @@ class FSM {
   onEvent(e, action_name, current_state) {
     const next_states = this.transitions[action_name].allowed_transitions[current_state]
     if(!next_states) {
-      throw("[FSM] Unexpected action "+action_name+" on state " + current_state)
+      throw(new Error("[FSM] Unexpected action "+action_name+" on state " + current_state))
     }
     const action_result = this.transitions[action_name].action(e)
     return this.parseActionResult(action_name, current_state, action_result)

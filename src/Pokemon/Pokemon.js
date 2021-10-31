@@ -51,7 +51,6 @@ class Pokemon extends React.Component {
     self.ASleepSprite     = new Sprite(self.props.name+"-asleep",      self.props.src, new Vector(360, 21),  new Vector(1, 0), self.spriteSize, 3,  1250, {scalePow: 2});
     self.WakingUpSprite   = new Sprite(self.props.name+"-waking-up",   self.props.src, new Vector(420, 21),  new Vector(1, 0), self.spriteSize, 3,  1250, {scalePow: 2});
 
-    console.log("SELF PROPS POSITION", self.props.position)
     self.state = {
       action: "idle",
       direction: "down",
@@ -68,7 +67,6 @@ class Pokemon extends React.Component {
   }
 
   onFSMEvent(e, action) {
-    console.log("THIS", this)
     return function () {
       try {
         return this.FSM.onEvent(e, action, this.state.action)
@@ -107,9 +105,6 @@ class Pokemon extends React.Component {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    console.log("x", x, "y", y)
-    console.log("this.selectedSprite().spriteSize.y", this.selectedSprite().spriteSize)
-
     const movementVect = new Vector(x - (spriteRect.left - rect.left) - this.selectedSprite().spriteSize.x/2, y - (spriteRect.top - rect.top) - this.selectedSprite().spriteSize.y/2);
 
     const angleSides = 4
@@ -132,7 +127,6 @@ class Pokemon extends React.Component {
     previousZIndexAnimation && previousZIndexAnimation.cancel()
     const previousZIndex = Math.floor(spriteRect.top - rect.top + this.selectedSprite().spriteSize.y)
     const nextZIndex = Math.floor(y + this.selectedSprite().spriteSize.y/2)
-    console.log("ZINDEX ANIM", {from: previousZIndex, to: nextZIndex})
     const zIndexAnimation = this.state.ref.animate([{zIndex: previousZIndex}, {zIndex: nextZIndex}], transition*1000)
     zIndexAnimation.animationName = "zIndex"
     zIndexAnimation.onfinish = function() {
